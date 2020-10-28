@@ -1,0 +1,6 @@
+framework module Pods_MoneyMe {
+  umbrella header "Pods-MoneyMe-umbrella.h"
+
+  export *
+  module * { export * }
+}
