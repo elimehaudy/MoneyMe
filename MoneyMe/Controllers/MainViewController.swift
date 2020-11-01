@@ -20,24 +20,14 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         tableView.delegate = self
         manager.loadItems()
+        reloadUI()
+    }
+    
+    func reloadUI() {
         tableView.reloadData()
         totalSumLabel.text = String(manager.calculateBalance())
     }
     
-    func updateCell(_ cell: UITableViewCell, at indexPath: IndexPath) {
-        cell.textLabel?.text = manager.items?[indexPath.row].title ?? "No Items added yet"
-        if manager.items != nil {
-            let sumInCell = manager.items![indexPath.row].sum
-            if sumInCell > 0 {
-                cell.detailTextLabel?.textColor = .systemGreen
-            } else if sumInCell < 0 {
-                cell.detailTextLabel?.textColor = .systemRed
-            }
-            cell.detailTextLabel?.text = String(sumInCell)
-        } else {
-            cell.detailTextLabel?.isHidden = true
-        }
-    }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let destinationVC = segue.destination as? EditorViewController {
             if segue.identifier == "negativeSum" {
@@ -56,7 +46,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBAction func unwindToViewControllerA(segue: UIStoryboardSegue) {
         DispatchQueue.global(qos: .userInitiated).async {
             DispatchQueue.main.async {
-                self.tableView.reloadData()
+                self.reloadUI()
             }
         }
     }
@@ -72,6 +62,27 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         updateCell(cell, at: indexPath)
         return cell
+    }
+    
+    func updateCell(_ cell: UITableViewCell, at indexPath: IndexPath) {
+        cell.textLabel?.text = manager.items?[indexPath.row].title ?? "No Items added yet"
+        displaySumInDetailLabel(cell: cell, indexPath: indexPath)
+    }
+    
+    func displaySumInDetailLabel(cell: UITableViewCell, indexPath: IndexPath) {
+        if manager.items != nil {
+            let sumInCell = manager.items![indexPath.row].sum
+            if sumInCell > 0 {
+                cell.detailTextLabel?.textColor = .systemGreen
+            } else if sumInCell < 0 {
+                cell.detailTextLabel?.textColor = .systemRed
+            } else {
+                cell.detailTextLabel?.textColor = .black
+            }
+            cell.detailTextLabel?.text = String(sumInCell)
+        } else {
+            cell.detailTextLabel?.isHidden = true
+        }
     }
     
     //MARK: - UITableView Delegate Methods

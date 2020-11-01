@@ -27,11 +27,18 @@ struct ItemManager {
             try realm.write {
                 realm.add(item)
             }
+            
         } catch {
             print("Error saving item, \(error)")
         }
     }
-
+    
+    func updateItem(item: Item, newValue: String, selectedKey: String) {
+        try! realm.write{
+            item.setValue(newValue, forKey: selectedKey)
+        }
+    }
+    
     mutating func loadItems() {
         items = realm.objects(Item.self)
     }
@@ -48,7 +55,7 @@ struct ItemManager {
     
     func calculateBalance() -> Int {
         var totalBalance = 0
-
+        
         if items != nil {
             for item in items! {
                 totalBalance += item.sum

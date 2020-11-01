@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RealmSwift
 
 class EditorViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
@@ -14,9 +13,8 @@ class EditorViewController: UIViewController, UITextFieldDelegate, UITextViewDel
     @IBOutlet weak var sumField: UITextField!
     @IBOutlet weak var detailsField: UITextView!
     var isPositive = true
-
-    var manager = ItemManager()
     
+    var manager = ItemManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,12 +28,27 @@ class EditorViewController: UIViewController, UITextFieldDelegate, UITextViewDel
         let title = titleField.text
         let sum = Int(sumField.text!)
         let details = detailsField.text
-        let newItem = manager.createItem(title: title!, sum: sum!, details: details!)
-        if !isPositive {
-            newItem.sum *= -1
-        }
         
-        manager.saveItem(item: newItem)
-        performSegue(withIdentifier: "goBack", sender: self)
+        let titleIsFilled = checkTextField(textfield: titleField, message: "Add title")
+        let sumIsFilled = checkTextField(textfield: sumField, message: "Add sum")
+        if titleIsFilled && sumIsFilled {
+            let newItem = manager.createItem(title: title!, sum: sum!, details: details!)
+            if !isPositive {
+                newItem.sum *= -1
+            }
+            manager.saveItem(item: newItem)
+            performSegue(withIdentifier: "goBack", sender: self)
+        }
+    }
+    
+    func checkTextField(textfield: UITextField, message: String) -> Bool{
+        if textfield.text == "" {
+            let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return false
+        } else {
+            return true
+        }
     }
 }

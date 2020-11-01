@@ -6,13 +6,17 @@
 //
 
 import UIKit
+import RealmSwift
 
-class DetailsViewController: UIViewController {
+class DetailsViewController: UIViewController, UITextFieldDelegate {
     
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var sumLabel: UILabel!
-    @IBOutlet weak var detailsLabel: UILabel!
+    @IBOutlet weak var titleTextField: UITextField!
+    @IBOutlet weak var sumTextField: UITextField!
+    @IBOutlet weak var detailsTextField: UITextField!
+    @IBOutlet weak var editBarButton: UIBarButtonItem!
+    @IBOutlet weak var doneButton: UIButton!
     
+    let realm = try! Realm()
     var manager = ItemManager()
     var selectedItem: Item? {
         didSet{
@@ -21,22 +25,66 @@ class DetailsViewController: UIViewController {
             }
         }
     }
+    var keyForValueToBeChanged = ""
+    var changedTextField = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        titleTextField.delegate = self
+        sumTextField.delegate = self
+        detailsTextField.delegate = self
     }
     
     func showItemDetails() {
         if let selectedItemUnwrapped = selectedItem {
-            titleLabel.text = selectedItemUnwrapped.title
-            sumLabel.text = String(selectedItemUnwrapped.sum)
-            detailsLabel.text = selectedItemUnwrapped.details
+            titleTextField.text = selectedItemUnwrapped.title
+            sumTextField.text = String(selectedItemUnwrapped.sum)
+            detailsTextField.text = selectedItemUnwrapped.details
         }
     }
     
-    @IBAction func deleteButtonPressed(_ sender: UIButton) {
-        manager.deleteItem(selectedItem!)
-        performSegue(withIdentifier: "goBack", sender: sender)
+    @IBAction func editButtonTapped(_ sender: UIBarButtonItem) {
+        editBarButton.isEnabled = false
+        doneButton.isHidden = false
+        doneButton.isEnabled = true
+        editEnabled(textField: titleTextField)
+        editEnabled(textField: sumTextField)
+        editEnabled(textField: detailsTextField)
+    }
+    
+    
+    func editEnabled(textField: UITextField) {
+        textField.isUserInteractionEnabled = true
+        textField.backgroundColor = .white
+        textField.addTarget(self, action: #selector(DetailsViewController.textFieldDidChange(_:)), for: .editingChanged)
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if textField.tag == 1 {
+            keyForValueToBeChanged = "title"
+        } else if textField.tag == 2 {
+            keyForValueToBeChanged = "sum"
+        } else if textField.tag == 3 {
+            keyForValueToBeChanged = "details"
+        }
+        changedTextField = textField.text!
+    }
+    
+    @IBAction func doneButtonTapped(_ sender: UIButton) {
+        manager.updateItem(item: selectedItem!, newValue: changedTextField, selectedKey: keyForValueToBeChanged)
+        self.performSegue(withIdentifier: "goBack", sender: sender)
+    }
+    
+    @IBAction func deleteButtonTapped(_ sender: UIButton) {
+        let alert = UIAlertController(title: "Deletion Message", message: "Are you sure you want to delete this item?", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        let action = UIAlertAction(title: "Delete", style: .destructive) { (alertAction) in
+            self.manager.deleteItem(self.selectedItem!)
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+        self.performSegue(withIdentifier: "goBack", sender: sender)
     }
     
 }
