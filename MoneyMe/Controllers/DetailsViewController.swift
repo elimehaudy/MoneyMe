@@ -84,7 +84,7 @@ class DetailsViewController: UIViewController, UITextFieldDelegate {
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
-        self.performSegue(withIdentifier: "goBack", sender: sender)
+//        self.performSegue(withIdentifier: "goBack", sender: sender)
     }
     
 }
