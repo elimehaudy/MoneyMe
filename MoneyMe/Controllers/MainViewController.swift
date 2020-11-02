@@ -73,7 +73,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         if manager.items != nil {
             let sumInCell = manager.items![indexPath.row].sum
             if sumInCell > 0 {
-                cell.detailTextLabel?.textColor = .systemGreen
+                cell.detailTextLabel?.textColor = #colorLiteral(red: 0.357375443, green: 0.6686962247, blue: 0.5102114081, alpha: 1)
             } else if sumInCell < 0 {
                 cell.detailTextLabel?.textColor = .systemRed
             } else {

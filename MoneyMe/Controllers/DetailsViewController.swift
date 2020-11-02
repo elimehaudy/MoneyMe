@@ -27,6 +27,7 @@ class DetailsViewController: UIViewController, UITextFieldDelegate {
     }
     var keyForValueToBeChanged = ""
     var changedTextField = ""
+    var valueWasChanged = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,10 +58,12 @@ class DetailsViewController: UIViewController, UITextFieldDelegate {
     func editEnabled(textField: UITextField) {
         textField.isUserInteractionEnabled = true
         textField.backgroundColor = .white
+        textField.textColor = .black
         textField.addTarget(self, action: #selector(DetailsViewController.textFieldDidChange(_:)), for: .editingChanged)
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
+        valueWasChanged = true
         if textField.tag == 1 {
             keyForValueToBeChanged = "title"
         } else if textField.tag == 2 {
@@ -72,7 +75,9 @@ class DetailsViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func doneButtonTapped(_ sender: UIButton) {
-        manager.updateItem(item: selectedItem!, newValue: changedTextField, selectedKey: keyForValueToBeChanged)
+        if valueWasChanged {
+            manager.updateItem(item: selectedItem!, newValue: changedTextField, selectedKey: keyForValueToBeChanged)
+        }
         self.performSegue(withIdentifier: "goBack", sender: sender)
     }
     
@@ -84,7 +89,7 @@ class DetailsViewController: UIViewController, UITextFieldDelegate {
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
-//        self.performSegue(withIdentifier: "goBack", sender: sender)
+        //        self.performSegue(withIdentifier: "goBack", sender: sender)
     }
     
 }
